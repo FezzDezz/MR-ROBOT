@@ -184,7 +184,7 @@ def command_template_handler(call: Union[CallbackQuery, Message]):
 			   '<code>{header_line}</code>\n' \
 			   '⠀'.format(header_line='—' * (16 + headerEmptySpaceAmount * 2),
 						  empty=EmptySymbol * headerEmptySpaceAmount,
-						  header_text=f'ШАБЛОН<code>{EmptySymbol}</code>СКАРБУ',
+						  header_text=f'ШАБЛОН СКАРБУ',
 						  body=TemplateTreasure.ToString)
 		# text = f'{text}{TemplateTreasure.ToString}<code>{"—" * (24 + headerEmptySpaceAmount * 2)}</code>'
 		if _chat_type == 'supergroup':
