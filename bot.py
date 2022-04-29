@@ -12,7 +12,7 @@ from telebot.storage import StateMemoryStorage
 from keyboa import Keyboa, Button
 
 from Config import *
-from Keyboard import InlineKeyboard
+# from Keyboard import InlineKeyboard
 from Treasure import Treasure, Template
 # endregion ╰─╼[Imports]╾─╯
 
@@ -40,7 +40,6 @@ class JsonParser:
 	pass
 # endregion ───╼[Global classes]╾───
 
-
 # region ───╼[States group]╾───
 class BotDataStates(StatesGroup):
 	set = State()
@@ -62,24 +61,24 @@ def command_start_handler(call: Union[CallbackQuery, Message]):
 	# region <Обробка та сворення тексту та клавіатури для меню>
 	def GenerateMainMenuText(_chat_type):
 		headerEmptySpaceAmount = 5
-		template_text = "{}{}".format('<i><b>шаблон скарбу:</b></i> ', '❌' if not TemplateTreasure.IsSet else f'\n{TemplateTreasure.ToString}')
+		template_text = "{}{}".format('<i><b>Шаблон скарбу:</b></i> ', '❌\n' if not TemplateTreasure.IsSet else f'\n{TemplateTreasure.ToString}')
 		text = '<code>{header_line}</code>\n' \
 			   '<code>{empty}</code><b>{header_text}</b><code>{empty}</code>\n' \
 			   '<code>{header_line}</code>\n' \
-			   '{template_text}\n'.format(header_line='—' * (18 + headerEmptySpaceAmount * 2),
+			   '{template_text}' \
+			   '<code>{header_line}</code>\n'.format(header_line='—' * (19 + headerEmptySpaceAmount * 2),
 										  empty='⠀' * headerEmptySpaceAmount,
 										  header_text='ГОЛОВНЕ МЕНЮ',
 										  template_text=template_text)
 		if _chat_type == 'supergroup':
 			text = f"{text}" \
-				   f"<code>{'—' * (16 + headerEmptySpaceAmount * 2)}\n</code>" \
 				   f"<b>👤:</b><code> {user_name}\n</code>"
 			return text
 		return text
 	def GenerateMenuKeyboard():
 		# Buttons
 		btn_edit_template = Button(button_data={'Шаблон': 'template'}, front_marker='/').button
-		btn_add_treasure = Button(button_data={'Добавити скарб': 'treasure'}, front_marker='/new_').button
+		btn_add_treasure = Button(button_data={'Добавити скарб': 'treasure'}, front_marker='/add_').button
 		# Markup
 		menu = [
 			btn_edit_template,
@@ -170,7 +169,6 @@ def command_delete_my_commands(message):
 @bot.message_handler(chat_id=AllowedIDs, commands=['template'])
 @bot.callback_query_handler(func=lambda call: call.data == '/template')
 def command_template_handler(call: Union[CallbackQuery, Message]):
-	print(JsonParser.dumps(call))
 	chat_id = call.message.chat.id if type(call) is CallbackQuery else call.chat.id
 	chat_type = call.message.chat.type if type(call) is CallbackQuery else call.chat.id
 	user_name = call.from_user.first_name
@@ -184,7 +182,7 @@ def command_template_handler(call: Union[CallbackQuery, Message]):
 			   '<code>{header_line}</code>\n' \
 			   '⠀'.format(header_line='—' * (18 + headerEmptySpaceAmount * 2),
 						  empty=EmptySymbol * headerEmptySpaceAmount,
-						  header_text=f'ШАБЛОН СКАРБУ',
+						  header_text=f'ШАБЛОН<code>{EmptySymbol}</code>СКАРБУ',
 						  body=TemplateTreasure.ToString)
 		# text = f'{text}{TemplateTreasure.ToString}<code>{"—" * (24 + headerEmptySpaceAmount * 2)}</code>'
 		if _chat_type == 'supergroup':
@@ -315,47 +313,9 @@ def command_template_edit_handler(call: CallbackQuery):
 
 @bot.callback_query_handler(func=lambda call: call.data.split('=', 1)[0][0:13] == '/template_set')
 def command_template_set_item_handler(call: CallbackQuery):
-	chat_id = call.message.chat.id
-	chat_type = call.message.chat.type
 	user_name = call.from_user.first_name
 	item_to_set = call.data.split('=', 1)[0][14:]
 	callback_answer_text = 'Втановлено '
-
-	recived_callback: CallbackQuery = call
-
-	# region <Обробка та сворення тексту та клавіатури для меню>
-	def GenerateMenuText(_chat_type):
-		menu_text = ''
-		headerEmptySpaceAmount = 1
-		menu_text = '<code>{header_line}</code>\n' \
-					'<code>{empty}</code><b>{header_text}</b><code>{empty}</code>\n' \
-					'<code>{header_line}</code>\n'.format(header_line='—' * (24 + headerEmptySpaceAmount * 2),
-														  empty='⠀' * headerEmptySpaceAmount,
-														  header_text='НАЛАШТУВАННЯ ШАБЛОНУ')
-		menu_text = f'{menu_text}{TemplateTreasure.ToString}<code>{"—" * (24 + headerEmptySpaceAmount * 2)}</code>'
-		if _chat_type == 'supergroup':
-			text = f"{menu_text}\n" \
-				   f"<b>👤:</b><code> {user_name}\n</code>"
-		return menu_text
-	def GenerateMenuKeyboard():
-		# Buttons
-		btn_edit_product = Button(button_data={'Товар': 'product'}, front_marker='/template_edit=').button
-		btn_edit_hide_type = Button(button_data={'Тип': 'hide_type'}, front_marker='/template_edit=').button
-		btn_edit_iso_color = Button(button_data={'Колір ізо': 'iso_color'}, front_marker='/template_edit=').button
-		btn_edit_district = Button(button_data={'Район': 'district'}, front_marker='/template_edit=').button
-		btn_save = Button(button_data={'Зберегти собі': '/template_save'}).button
-		btn_return = Button(button_data={'« Назад': '/start'}).button
-		# Markup
-		menu = [
-			[btn_edit_product, btn_edit_hide_type],
-			[btn_edit_iso_color, btn_edit_district],
-			btn_save,
-			btn_return
-		]
-		# Keyboard
-		keyboard = Keyboa(items=menu, copy_text_to_callback=False).keyboard
-		return keyboard
-	# endregion <Обробка та сворення тексту та клавіатури для меню>
 	# region <Встановлюємо змінні TemplateProduct відповідно вибраному пункту>
 	if item_to_set == 'product':
 		TemplateTreasure.product = call.data.split('=', 1)[1]
@@ -367,7 +327,11 @@ def command_template_set_item_handler(call: CallbackQuery):
 		TemplateTreasure.hide_type = call.data.split('=', 1)[1]
 		callback_answer_text += f'тип: {TemplateTreasure.hide_type}'
 	elif item_to_set == 'iso_color':
-		TemplateTreasure.iso_color = call.data.split('=', 1)[1]
+		for color_item in Colors.items():
+			if call.data.split('=', 1)[1] == color_item[0]:
+				TemplateTreasure.iso_color = color_item
+
+
 		callback_answer_text += f'колір ізо: {TemplateTreasure.iso_color}'
 	elif item_to_set == 'district':
 		TemplateTreasure.district = call.data.split('=', 1)[1]
@@ -376,22 +340,73 @@ def command_template_set_item_handler(call: CallbackQuery):
 	# Запам'ятовуємо юзера хто встановлював шаблон
 	TemplateTreasure.owner_user = user_name
 	# endregion ╰<Встановлюємо змінні TemplateProduct відповідно вибраному пункту>╯
-
-	# Відповідаємо на отриманий callback
-	bot.answer_callback_query(callback_query_id=call.id, text=callback_answer_text)
-	# Міняємо текст на кнопки повідомлення
-	# bot.edit_message_text(
-	# 	text=f'{GenerateMenuText(chat_type)}',
-	# 	chat_id=chat_id,
-	# 	message_id=call.message.message_id,
-	# 	reply_markup=GenerateMenuKeyboard()
-	# )
-
-	recived_callback.data = '/template'
-	command_template_handler(recived_callback)
+	# Міняємо текст callback data за допомогою виклику команди меню шаблона
+	command_template_handler(call)
 	pass
-
 # endregion ╰<Template treasure commands>╯
+
+# region <Treasure commands>
+@bot.message_handler(chat_id=AllowedIDs, commands=['add_treasure'])
+@bot.callback_query_handler(func=lambda call: call.data == '/add_treasure')
+def command_add_treasure_handler(call: Union[CallbackQuery, Message]):
+	chat_id = call.message.chat.id if type(call) is CallbackQuery else call.chat.id
+	chat_type = call.message.chat.type if type(call) is CallbackQuery else call.chat.id
+	user_name = call.from_user.first_name
+	# region <Обробка та сворення тексту та клавіатури для меню>
+	def GenerateMainMenuText(_chat_type):
+		headerEmptySpaceAmount = 6
+		treasure_text = f'{treasure.ToString}'
+		text = '<code>{header_line}</code>\n' \
+			   '<code>{empty}</code><b>{header_text}</b><code>{empty}</code>\n' \
+			   '<code>{header_line}</code>\n' \
+			   '{body_text}' \
+			   '<code>{header_line}</code>\n'.format(header_line='—' * (18 + headerEmptySpaceAmount * 2),
+													 empty='⠀' * headerEmptySpaceAmount,
+													 header_text='НОВИЙ СКАРБ',
+													 body_text=treasure_text)
+		if _chat_type == 'supergroup':
+			text = f"{text}" \
+				   f"<b>👤:</b><code> {user_name}\n</code>"
+			return text
+		return text
+	def GenerateMenuKeyboard():
+		# Buttons
+		btn_save_treasure = Button(button_data={'Зберегти скарб': 'treasure'}, front_marker='/save_').button
+		btn_delete_treasure = Button(button_data={'Видалити скарб': 'treasure'}, front_marker='/delete_').button
+		# Markup
+		menu = [btn_save_treasure, btn_delete_treasure]
+		# Keyboard
+		keyboard = Keyboa(items=menu, items_in_row=1, copy_text_to_callback=False).keyboard
+		return keyboard
+	# endregion <Обробка та сворення тексту та клавіатури для меню>
+	# region <Якщо викликано через Inline кнопки>
+	if type(call) is CallbackQuery:
+		# Якщо викликано через кнопку
+		if not TemplateTreasure.IsSet:
+			bot.answer_callback_query(call.id, f'❗️Шаблон скарбу не знайдено❗️\nДля продовження необхідно задати шаблон!', show_alert=True)
+		else:
+			bot.answer_callback_query(call.id, f'Створення нового скарбу')
+			treasure = Treasure()
+			treasure.apply_template(TemplateTreasure)
+			bot.edit_message_text(
+				text=GenerateMainMenuText(chat_type),
+				chat_id=chat_id,
+				message_id=call.message.message_id,
+				reply_markup=GenerateMenuKeyboard()
+			)
+		pass
+	# endregion ╰<Якщо викликано через Inline кнопки>╯
+	# region <Якщо викликано через команду>
+	if type(call) is Message:
+		bot.send_message(
+			chat_id=chat_id,
+			text=GenerateMainMenuText(chat_type),
+			reply_markup=GenerateMenuKeyboard()
+		)
+		pass
+	# endregion ╰<Якщо викликано через команду>╯
+	pass
+# endregion ╰<Treasure commands>╯
 
 # endregion ╰───╼[Handle bot commands]╾───╯
 
@@ -434,7 +449,7 @@ def callback_save_template_handler(call: CallbackQuery):
 # region ───╼[Methods]╾───
 # region ───[Filter users by ID]───
 def FilterUsersById(message):
-	chat_id = message.from_user.id
+	chat_id = message.chat.id
 	error_text = 'No no no, you are not allowed to use this bot!'
 	bot.send_message(chat_id, error_text)
 	pass
@@ -461,17 +476,16 @@ def RegisterMessageHandlers():
 # region ───╼[Update Listener]╾───
 def UpdateListener(messages):
 	for message in messages:
-		chat_id = message.from_user.id
+		chat_id = message.chat.id
+		# region [Message dubugging]
+		# if MESSAGE_DEBUG: print('[UpdateListener] Message debug:', JsonParser.dumps(message))
+		print('[UpdateListener] Message debug:', JsonParser.dumps(message)) if MESSAGE_DEBUG else None
+		# endregion ╰─[Message dubugging]─╯
 		# region [Filter not allowed users]
-		if chat_id not in AllowedUsersIDs:
+		if chat_id not in AllowedIDs:
 			"Фільтрація доступу користування користувачів по їх UserID"
 			FilterUsersById(message)
 		# endregion ╰—[Filter not allowed users]—╯
-		# region [Message dubugging]
-		if MESSAGE_DEBUG:
-			# print(jsonpickle.encode(message, indent=2, unpicklable=False))
-			print(JsonParser.dumps(message))
-		# endregion ╰─[Message dubugging]─╯
 
 		# region [TESTING]
 
