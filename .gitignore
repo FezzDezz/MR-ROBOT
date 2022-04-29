@@ -12,3 +12,8 @@ Keyboard/__pycache__/inline.cpython-310.pyc
 Treasure/__pycache__/template.cpython-310.pyc
 Treasure/__pycache__/__init__.cpython-310.pyc
 Treasure/__pycache__/treasure.cpython-310.pyc
+/docs/
+/docs/build/
+/docs/source/
+/docs/make.bat
+/docs/Makefile
