@@ -32,19 +32,28 @@ class Template:
 		self.iso_color = None
 		self.district = None
 
+	def set_random(self):
+		self.product = None
+		self.amount = None
+		self.hide_type = None
+		self.iso_color = None
+		self.district = None
+
+
+
 	@property
 	def ToString(self):
 		text  = '<code>    товар</code><b>:</b> <i>{}</i>\n'.format("❌" if self.product is None else self.product)
 		text += '<code>кількість</code><b>:</b> <i>{}</i>\n'.format("❌" if self.amount is None else self.amount)
 		text += '<code>      тип</code><b>:</b> <i>{}</i>\n'.format("❌" if self.hide_type is None else self.hide_type)
-		text += '<code>колір ізо</code><b>:</b> <i>{}</i>\n'.format("❌" if self.iso_color is None else self.iso_color)
+		text += '<code>колір ізо</code><b>:</b> <i>{}</i>\n'.format("❌" if self.iso_color is None else self.iso_color[0])
 		text += '<code>    район</code><b>:</b> <i>{}</i>\n'.format("❌" if self.district is None else self.district)
 		return text
 
 	@property
 	def IsSet(self):
 		for item in self.to_dict().items():
-			if item[1] is None:
+			if item[0] != 'owner_user' and item[1] is None:
 				return  False
 		return True
 
