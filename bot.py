@@ -66,7 +66,7 @@ def command_start_handler(call: Union[CallbackQuery, Message]):
 		text = '<code>{header_line}</code>\n' \
 			   '<code>{empty}</code><b>{header_text}</b><code>{empty}</code>\n' \
 			   '<code>{header_line}</code>\n' \
-			   '{template_text}\n'.format(header_line='—' * (16 + headerEmptySpaceAmount * 2),
+			   '{template_text}\n'.format(header_line='—' * (18 + headerEmptySpaceAmount * 2),
 										  empty='⠀' * headerEmptySpaceAmount,
 										  header_text='ГОЛОВНЕ МЕНЮ',
 										  template_text=template_text)
@@ -182,7 +182,7 @@ def command_template_handler(call: Union[CallbackQuery, Message]):
 			   '<code>{header_line}</code>\n' \
 			   '{body}' \
 			   '<code>{header_line}</code>\n' \
-			   '⠀'.format(header_line='—' * (16 + headerEmptySpaceAmount * 2),
+			   '⠀'.format(header_line='—' * (18 + headerEmptySpaceAmount * 2),
 						  empty=EmptySymbol * headerEmptySpaceAmount,
 						  header_text=f'ШАБЛОН СКАРБУ',
 						  body=TemplateTreasure.ToString)
@@ -215,7 +215,7 @@ def command_template_handler(call: Union[CallbackQuery, Message]):
 	# region <Якщо викликано через Inline кнопки>
 	if type(call) is CallbackQuery:
 		# Відповідаємо на отриманий callback
-		bot.answer_callback_query(call.id, 'Налаштування шаблонного скарбу')
+		bot.answer_callback_query(call.id, 'Налаштування шаблону')
 		# Міняємо текст на кнопки повідомлення
 		bot.edit_message_text(
 			text=f'{GenerateMenuText(chat_type)}',
@@ -293,15 +293,16 @@ def command_template_edit_handler(call: CallbackQuery):
 
 		return Keyboa.combine(keyboards=(keyboard, keyboard_controls))
 	# endregion <Обробка та сворення тексту меню та клавіатури>
+
 	# Відповідаємо на отриманий callback
 	bot.answer_callback_query(
 		callback_query_id=call.id,
-		text='Редагування шаблонного {}'.format(
+		text='Редагування {}'.format(
 			'продукту' if call.data.split('=', 1)[1] == 'product' else
+			'кількості' if call.data.split('=', 1)[1] == 'amount' else
 			'типу' if call.data.split('=', 1)[1] == 'hide_type' else
 			'кольору ізо' if call.data.split('=', 1)[1] == 'iso_color' else
-			'району' if call.data.split('=', 1)[1] == 'district' else ''
-		)
+			'району' if call.data.split('=', 1)[1] == 'district' else '')
 	)
 	# Міняємо текст на кнопки повідомлення
 	bot.edit_message_text(
@@ -318,7 +319,7 @@ def command_template_set_item_handler(call: CallbackQuery):
 	chat_type = call.message.chat.type
 	user_name = call.from_user.first_name
 	item_to_set = call.data.split('=', 1)[0][14:]
-	callback_answer_text = 'Втановлено шаблонний '
+	callback_answer_text = 'Втановлено '
 
 	recived_callback: CallbackQuery = call
 
