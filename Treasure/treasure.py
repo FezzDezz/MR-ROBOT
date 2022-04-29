@@ -37,5 +37,15 @@ class Treasure:
 		self.iso_color = None
 		self.district = None
 
+	@property
+	def ToString(self):
+		text  = '<code>     фото</code><b>:</b> <i>{}</i>\n'.format("❌" if self.photos_id is None else '✅')
+		text += '<code>  локація</code><b>:</b> <i>{}</i>\n'.format("❌" if self.location is None else f'{self.location[0]},{self.location[1]}')
+		text += '<code>    товар</code><b>:</b> <i>{}</i>\n'.format("❌" if self.product is None else self.product)
+		text += '<code>кількість</code><b>:</b> <i>{}</i>\n'.format("❌" if self.amount is None else self.amount)
+		text += '<code>      тип</code><b>:</b> <i>{}</i>\n'.format("❌" if self.hide_type is None else self.hide_type)
+		text += '<code>колір ізо</code><b>:</b> <i>{}</i>\n'.format("❌" if self.iso_color is None else f'{self.iso_color[0]} {self.iso_color[1]}')
+		text += '<code>    район</code><b>:</b> <i>{}</i>\n'.format("❌" if self.district is None else self.district)
+		return text
 
 	pass
